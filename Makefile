@@ -80,11 +80,11 @@ ineffassign:
 
 lint:
 # We use `go list -f '{{.Dir}}' $(MODULE)/...` to skip the `vendor` folder.
-	go list -f '{{.Dir}}' $(MODULE)/... | xargs golint -set_exit_status
+	go list -f '{{.Dir}}' $(MODULE)/... | xargs golangci-lint run
 
 lint-internal:
 # We use `go list -f '{{.Dir}}' $(MODULE)/...` to skip the `vendor` folder.
-	go list -f '{{.Dir}}' $(MODULE)/internal/... | xargs golint -set_exit_status
+	go list -f '{{.Dir}}' $(MODULE)/internal/... | xargs golangci-lint run
 
 misspell:
 	misspell $(MODULE)/...
@@ -148,6 +148,7 @@ $(DOCKER_TARGETS): docker-%: .build-image
 	@echo "Running 'make $(*)' in docker container $(BUILDIMAGE)"
 	$(DOCKER) run \
 		--rm \
+		-e HOME=$(PWD) \
 		-e GOCACHE=$(PWD)/.cache/go \
 		-e GOPATH=$(PWD)/.cache/gopath \
 		-v $(PWD):$(PWD) \
@@ -162,6 +163,7 @@ PHONY: .shell
 	$(DOCKER) run \
 		--rm \
 		-ti \
+		-e HOME=$(PWD) \
 		-e GOCACHE=$(PWD)/.cache/go \
 		-e GOPATH=$(PWD)/.cache/gopath \
 		-v $(PWD):$(PWD) \
